@@ -17,6 +17,10 @@ const userSchema = mongoose.Schema({
     password: {
         type: String
     },
+    Role: {
+        type: String,
+        default: 'user'
+    },
     referralCode: {
         type: String
     },

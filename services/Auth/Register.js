@@ -3,7 +3,8 @@ const ErrorResponse = require("../../utils/ErrorResponse");
 let referralCodeGenerator = require("referral-code-generator");
 const randomize = require('randomatic');
 const crypto = require("crypto");
-const sendEmail = require("../../utils/SendEmail");
+const sendEmail = require("../../utils/sendEmail");
+const jwt = require("jsonwebtoken");
 
 const register = async (req, res, next) => {
     // business logic
@@ -39,12 +40,13 @@ const register = async (req, res, next) => {
         throw new ErrorResponse("User already existed", 400);
     }
 
+    await sendEmail({to: email, subject: "Registration Verification", text: '', html: message}, []);
+
     const saveData = await User.create(data);
 
     const message = `Welcome to our business.\nPlease verify you email.\nYour One Time Password is: <span>${otp}</span>.`
 
-    await sendEmail({to: email, subject: "Registration Verification", text: '', html: message}, []);
-
+    
     return {
         "data": saveData,
         "metaData": {}
