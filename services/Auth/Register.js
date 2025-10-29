@@ -31,7 +31,7 @@ const register = async (req, res, next) => {
         password,
         phone,
         referralCode: refCode,
-        referredBy: referredBy?.lowercase() || null,
+        referredBy: referredBy?.toLowerCase() || null,
         verificationCode: converted
     };
 
@@ -40,11 +40,13 @@ const register = async (req, res, next) => {
         throw new ErrorResponse("User already existed", 400);
     }
 
-    await sendEmail({to: email, subject: "Registration Verification", text: '', html: message}, []);
+    // FIX: Define message BEFORE using it in sendEmail
+    const message = `Welcome to our business.\nPlease verify your email.\nYour One Time Password is: <span>${otp}</span>.`
+
+    // FIX: Fixed the sendEmail parameters - should be options.to not options.email
+    await sendEmail({to: email, subject: "Registration Verification", text: '', html: message});
 
     const saveData = await User.create(data);
-
-    const message = `Welcome to our business.\nPlease verify you email.\nYour One Time Password is: <span>${otp}</span>.`
 
     
     return {

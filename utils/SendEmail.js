@@ -1,6 +1,3 @@
-
-
-
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
@@ -24,29 +21,26 @@ const sendEmail = async (options) => {
         // 🔑 FIX 4: Explicitly enforce modern TLS protocols (resolves the "wrong version number" error)
         tls: {
             minVersion: 'TLSv1.2',
-            // IMPORTANT: If you are using port 587 (MAIL_SECURE=false),
-            // you must explicitly set rejectUnauthorized: false if your 
-            // server doesn't use a trusted certificate, but we'll stick 
-            // to just minVersion first.
         }
     });
 
     const message = {
         from: `Test <developer@appname.io>`,
-        to: options.email,
+        to: options.to, // FIX: Changed from options.email to options.to
         subject: options.subject,
-        html: options.message,
-        text: options.body,
+        html: options.html,
+        text: options.text,
     };
 
     try {
         const info = await transporter.sendMail(message);
         console.log("Message sent: %s", info.messageId);
+        return info; // Return info for potential use
         
     } catch (error) {
         console.error("Error sending email:", error);
         // Throw a specific error or handle it as needed
-        throw new Error("Email sending failed.");
+        throw new Error("Email sending failed: " + error.message);
     }
 };
 

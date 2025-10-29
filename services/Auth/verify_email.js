@@ -23,14 +23,10 @@ const verifyEmail = async (req, res, next) => {
         // Hash the OTP using SHA256 algorithm
         // WHY? During registration, we stored the hashed version of OTP in the database
         // We need to hash the user's input OTP to compare with what's stored
-        // crypto.createHash('sha256') - creates a SHA256 hash object
-        // .update(otp) - feeds the OTP string into the hash
-        // .digest('hex') - converts the hash to hexadecimal string format
         const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
 
         // Find user in database with matching email AND matching verification code
         // This ensures the OTP belongs to this specific user
-        // We use .select("+verificationCode") because verificationCode might be excluded by default
         const user = await User.findOne({
             email: email,
             verificationCode: hashedOTP
@@ -44,17 +40,16 @@ const verifyEmail = async (req, res, next) => {
             throw new ErrorResponse("Invalid OTP or email", 400);
         }
 
-        
+        // FIX: Check if user is already verified BEFORE updating
+        // This prevents re-verification and ensures users don't reuse old OTPs
+        if (user.isVerified) {
+            throw new ErrorResponse("Email already verified", 400);
+        }
 
         // Update user verification status
         // Set isVerified to true - marks the account as verified
         user.isVerified = true;
         
-        // Check if user is already verified
-        // This prevents re-verification and ensures users don't reuse old OTPs
-        if (user.isVerified) {
-            throw new ErrorResponse("Email already verified", 400);
-        }
         // Clear the verification code from database
         // WHY? Security best practice - OTPs should be single-use
         // Setting to null prevents the same OTP from being used again

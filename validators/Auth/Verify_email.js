@@ -57,16 +57,13 @@ const validateVerifyEmailObj = async (req, res, next) => {
             // WHY? Security - prevents unexpected fields from being processed
             stripUnknown: true
         });
-        res.send({
-            success: true,
-            message: "Email verified successfully"
-        });
 
-        // Replace request body with validated/sanitized data
+        // FIX: Replace request body with validated/sanitized data
         // WHY? Ensures only validated data proceeds to controller
         req.body = value;
         
-        // Call next() to proceed to the next middleware or controller
+        // FIX: Call next() to proceed to the next middleware or controller
+        // REMOVED the res.send() that was blocking the flow
         return next();
         
     } catch (error) {
