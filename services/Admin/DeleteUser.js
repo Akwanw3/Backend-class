@@ -10,7 +10,7 @@ const deletUser = async (req, res, next)=>{
     const user = await User.findByIdAndDelete(userId)
     const metaData = {}
     return{
-        data: `user deleted`,
+        data: `${user.name} deleted`,
         metaData
     }
 }

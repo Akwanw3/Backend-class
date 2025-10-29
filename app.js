@@ -9,6 +9,7 @@ const errorHandler = require("./middlewares/Error");
 const connect = require("./config/db");
 
 const authRoute = require("./routes/Auth");
+const adminRoute = require("./routes/Admin");
 
 // CORS, helmet, morgan, rate limiter, mongo sanitize, xss-clean, hpp, compression, cookie parser
 
@@ -35,6 +36,7 @@ connect()
 
 
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/admin", adminRoute);
 
 app.get('/', (req, res) => {
     res.status(200).json({
